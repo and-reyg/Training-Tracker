@@ -1,0 +1,61 @@
+﻿<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Tracker | Progress Chart</title>
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+    <link rel="apple-touch-icon" href="img/web-app-manifest-192x192.png" />
+    <meta name="theme-color" content="#142233" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body data-page="chart">
+    <div class="app-shell">
+      <header class="page-header">
+        <div class="page-header__inner">
+          <div class="page-header__title-row">
+            <h1>Графік прогресу</h1>
+            <p class="page-header__date" id="business-date"></p>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-main page-main--wide">
+        <section class="page-section page-section--tight">
+          <div class="section-heading section-heading--compact">
+            <div>
+              <p class="section-heading__eyebrow">Лише вправи з повторами</p>
+              <h2>Розвиток за 30 днів</h2>
+            </div>
+            <p class="section-heading__hint">
+              На смартфоні просто поверни телефон боком, щоб дивитися графік зручніше.
+            </p>
+          </div>
+
+          <div class="chart-legend" id="chart-legend"></div>
+
+          <div class="chart-card">
+            <div class="chart-axis-wrap">
+              <canvas id="chart-axis" aria-hidden="true"></canvas>
+            </div>
+            <div class="chart-scroll" id="chart-scroll">
+              <canvas id="chart-canvas"></canvas>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Основна навігація">
+        <a class="nav-link" href="index.html">Daily</a>
+        <a class="nav-link" href="monthly-review.html">Monthly Review</a>
+        <a class="nav-link is-active" href="progress-chart.html">Графік</a>
+        <a class="nav-link" href="breathing-gymnastics.html">Дихальна</a>
+        <a class="nav-link" href="breathing-view.html">Дихальна View</a>
+        <a class="nav-link" href="strength-exercises.html">Силові</a>
+      </nav>
+    </div>
+
+    <script type="module" src="scripts/chart.js"></script>
+  </body>
+</html>

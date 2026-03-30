@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Tracker | Monthly Review</title>
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+    <link rel="apple-touch-icon" href="img/web-app-manifest-192x192.png" />
+    <meta name="theme-color" content="#142233" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body data-page="review">
+    <div class="app-shell">
+      <header class="page-header">
+        <div class="page-header__inner">
+          <div class="page-header__title-row">
+            <h1>Monthly Review</h1>
+            <p class="page-header__date" id="business-date"></p>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-main page-main--wide">
+        <section class="page-section page-section--tight">
+          <div class="section-heading section-heading--compact">
+            <div>
+              <p class="section-heading__eyebrow">Історія за 30 днів</p>
+              <h2>Таблиця прогресу</h2>
+            </div>
+            <p class="section-heading__hint" id="review-count"></p>
+          </div>
+
+          <div class="table-card">
+            <div class="table-wrap">
+              <table class="review-table">
+                <thead>
+                  <tr>
+                    <th>Дата</th>
+                    <th>Вправа</th>
+                    <th>Повтори / Опис</th>
+                    <th>Хв</th>
+                  </tr>
+                </thead>
+                <tbody id="review-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Основна навігація">
+        <a class="nav-link" href="index.html">Daily</a>
+        <a class="nav-link is-active" href="monthly-review.html">Monthly Review</a>
+        <a class="nav-link" href="progress-chart.html">Графік</a>
+        <a class="nav-link" href="breathing-gymnastics.html">Дихальна</a>
+        <a class="nav-link" href="breathing-view.html">Дихальна View</a>
+        <a class="nav-link" href="strength-exercises.html">Силові</a>
+      </nav>
+    </div>
+
+    <script type="module" src="scripts/review.js"></script>
+  </body>
+</html>
