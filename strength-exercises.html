@@ -22,19 +22,60 @@
       </header>
 
       <main class="page-main">
-        <section class="placeholder-card" id="placeholder-root"></section>
+        <section class="page-section page-section--tight">
+          <div class="section-heading section-heading--compact">
+            <div>
+              <p class="section-heading__eyebrow">Strength Tracker</p>
+              <h2>Власні вправи і сети</h2>
+            </div>
+            <p class="section-heading__hint">
+              Додавай свої вправи, веди сети з вагою і повторами без щоденного очищення.
+            </p>
+          </div>
+
+          <div class="strength-toolbar">
+            <button class="primary-button" type="button" id="show-add-strength-exercise">
+              Додати вправу
+            </button>
+          </div>
+
+          <form class="exercise-form is-hidden" id="strength-add-form">
+            <p class="exercise-form__title">Нова силова вправа</p>
+            <div class="exercise-form__grid strength-form-grid">
+              <div class="field field--wide">
+                <label for="strength-exercise-name">Назва вправи</label>
+                <input
+                  id="strength-exercise-name"
+                  name="exerciseName"
+                  type="text"
+                  required
+                  placeholder="Наприклад Жим лежачи"
+                />
+              </div>
+            </div>
+            <div class="exercise-form__actions">
+              <button class="primary-button" type="submit">Додати ✓</button>
+              <button class="secondary-button" type="button" id="cancel-add-strength-exercise">
+                Скасувати
+              </button>
+            </div>
+          </form>
+
+          <div id="strength-exercises" class="exercise-list"></div>
+        </section>
       </main>
 
-      <nav class="bottom-nav" aria-label="Основна навігація">
-        <a class="nav-link" href="index.html">Daily</a>
-        <a class="nav-link" href="monthly-review.html">Monthly Review</a>
-        <a class="nav-link" href="progress-chart.html">Графік</a>
-        <a class="nav-link" href="breathing-gymnastics.html">Дихальна</a>
-        <a class="nav-link" href="breathing-view.html">Дихальна View</a>
-        <a class="nav-link is-active" href="strength-exercises.html">Силові</a>
-      </nav>
+      <div class="floating-timer" aria-label="Таймер тренування">
+        <div class="floating-timer__row">
+          <input id="strength-timer-input" class="timer-input" type="text" inputmode="numeric" value="00:00" aria-label="Таймер хвилини і секунди" />
+          <button id="strength-timer-toggle" class="secondary-button" type="button">Старт</button>
+          <button id="strength-timer-reset" class="secondary-button" type="button">Скинути</button>
+        </div>
+      </div>
+
+      <nav class="bottom-nav" aria-label="Основна навігація"></nav>
     </div>
 
-    <script type="module" src="scripts/placeholders.js"></script>
+    <script type="module" src="scripts/strength.js"></script>
   </body>
 </html>

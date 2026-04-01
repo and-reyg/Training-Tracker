@@ -131,7 +131,7 @@ function renderExerciseForm(exercise, editingEntry) {
   return `
     <form class="exercise-form" data-action="exercise-form" data-exercise-id="${exercise.id}">
       <p class="exercise-form__title">
-        ${isEditing ? "Редагування запису" : "Додати новий запис"}
+        ${isEditing ? "Редагування запису" : `Додати новий запис • ${getFormTitleSuffix(exercise.mode)}`}
       </p>
 
       <div class="exercise-form__grid">
@@ -164,6 +164,18 @@ function renderExerciseForm(exercise, editingEntry) {
       }
     </form>
   `;
+}
+
+function getFormTitleSuffix(mode) {
+  if (mode === "reps") {
+    return "Кількість Пвт";
+  }
+
+  if (mode === "minutes") {
+    return "Хвилини";
+  }
+
+  return "Опис і хвилини";
 }
 
 function renderFields(exercise, values) {

@@ -1,4 +1,4 @@
-﻿import { BREATHING_EXERCISES, getBreathingExerciseById } from "./breathing-config.js";
+﻿import { BREATHING_EXERCISES } from "./breathing-config.js";
 import { initCommonPage } from "./common.js";
 import {
   addBreathingEntry,
@@ -62,7 +62,7 @@ function renderExerciseCard(exercise, storageState) {
           <span class="exercise-card__dot" style="background:${exercise.color}"></span>
           <div>
             <p class="exercise-card__name">${exercise.name}</p>
-            <div class="exercise-card__mode">Опис + Пвт + Хв</div>
+            <div class="exercise-card__mode">Опис / Пвт + Хв</div>
           </div>
         </div>
 
@@ -147,33 +147,19 @@ function renderExerciseForm(exercise, editingEntry) {
   return `
     <form class="exercise-form" data-action="exercise-form" data-exercise-id="${exercise.id}">
       <p class="exercise-form__title">
-        ${isEditing ? "Редагування запису" : "Додати новий запис"}
+        ${isEditing ? "Редагування запису" : "Додати новий запис • Опис / Кількість Пвт"}
       </p>
 
       <div class="exercise-form__grid">
         <div class="field field--wide">
-          <label for="${exercise.id}-note">Опис</label>
+          <label for="${exercise.id}-note">Опис / Кількість Пвт</label>
           <input
             id="${exercise.id}-note"
             name="note"
             type="text"
             required
             value="${values.note}"
-            placeholder="Короткий опис"
-          />
-        </div>
-        <div class="field">
-          <label for="${exercise.id}-reps">Кількість Пвт</label>
-          <input
-            id="${exercise.id}-reps"
-            name="reps"
-            type="number"
-            inputmode="numeric"
-            min="1"
-            step="1"
-            required
-            value="${values.reps}"
-            placeholder="Наприклад 8"
+            placeholder="Наприклад 20 або короткий опис"
           />
         </div>
         <div class="field">
@@ -218,12 +204,11 @@ function renderExerciseForm(exercise, editingEntry) {
 
 function getFormValues(editingEntry) {
   if (!editingEntry) {
-    return { note: "", reps: "", minutes: "" };
+    return { note: "", minutes: "" };
   }
 
   return {
-    note: editingEntry.note ?? "",
-    reps: editingEntry.reps ?? "",
+    note: editingEntry.note || (editingEntry.reps ? String(editingEntry.reps) : ""),
     minutes: editingEntry.minutes ?? "",
   };
 }
@@ -324,15 +309,26 @@ function attachEvents(storageState) {
 }
 
 function buildPayload(formData) {
-  const note = String(formData.get("note") ?? "").trim();
-  const reps = Number(formData.get("reps"));
+  const rawNote = String(formData.get("note") ?? "").trim();
   const minutes = Number(formData.get("minutes"));
 
-  if (!note || !reps || !minutes) {
+  if (!rawNote || !minutes) {
     return null;
   }
 
-  return { note, reps, minutes };
+  if (/^\d+$/.test(rawNote)) {
+    return {
+      note: "",
+      reps: Number(rawNote),
+      minutes,
+    };
+  }
+
+  return {
+    note: rawNote,
+    reps: 0,
+    minutes,
+  };
 }
 
 function startTimer(exerciseId) {

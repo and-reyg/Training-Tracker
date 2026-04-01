@@ -198,8 +198,9 @@ function getTotals(entries = []) {
     (totals, entry) => ({
       reps: totals.reps + (entry.reps || 0),
       minutes: totals.minutes + (entry.minutes || 0),
+      count: totals.count + 1,
     }),
-    { reps: 0, minutes: 0 },
+    { reps: 0, minutes: 0, count: 0 },
   );
 }
 
@@ -219,7 +220,11 @@ export function getBreathingYesterdayTotals(state, exerciseId) {
 }
 
 export function formatBreathingTotals(totals) {
-  return `${totals.reps} Пвт • ${totals.minutes} Хв`;
+  if (totals.reps > 0) {
+    return `${totals.reps} Пвт • ${totals.minutes} Хв`;
+  }
+
+  return `${totals.count} зап. • ${totals.minutes} Хв`;
 }
 
 export function formatBreathingEntryValue(entry) {
@@ -229,7 +234,10 @@ export function formatBreathingEntryValue(entry) {
     parts.push(entry.note);
   }
 
-  parts.push(`${entry.reps} Пвт`);
+  if (entry.reps > 0) {
+    parts.push(`${entry.reps} Пвт`);
+  }
+
   parts.push(`${entry.minutes} Хв`);
 
   return parts.join(" • ");
@@ -244,11 +252,21 @@ export function getBreathingReviewRows(state) {
       const entries = day.entries[exercise.id] ?? [];
 
       entries.forEach((entry) => {
+        const contentParts = [];
+
+        if (entry.note) {
+          contentParts.push(entry.note);
+        }
+
+        if (entry.reps > 0) {
+          contentParts.push(`${entry.reps} Пвт`);
+        }
+
         rows.push({
           id: entry.id,
           date: day.date,
           exerciseName: exercise.name,
-          content: `${entry.note || "Без опису"} • ${entry.reps} Пвт`,
+          content: contentParts.length ? contentParts.join(" • ") : "—",
           minutes: entry.minutes,
           createdAt: entry.createdAt,
         });

@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Training Tracker | Monthly Review</title>
+    <title>Training Tracker | Силові View</title>
     <link rel="icon" type="image/png" href="img/favicon.png" />
     <link rel="apple-touch-icon" href="img/web-app-manifest-192x192.png" />
     <meta name="theme-color" content="#142233" />
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="styles/main.css" />
   </head>
-  <body data-page="review">
+  <body data-page="strength-view">
     <div class="app-shell">
       <header class="page-header">
         <div class="page-header__inner">
           <div class="page-header__title-row">
-            <h1>Monthly Review</h1>
+            <h1>Силові View</h1>
             <p class="page-header__date" id="business-date"></p>
           </div>
         </div>
@@ -25,24 +25,17 @@
         <section class="page-section page-section--tight">
           <div class="section-heading section-heading--compact">
             <div>
-              <p class="section-heading__eyebrow">Історія за 30 днів</p>
-              <h2>Таблиця прогресу</h2>
+              <p class="section-heading__eyebrow">Таблиця силових тренувань</p>
+              <h2>Дата, вправа і сети</h2>
             </div>
-            <p class="section-heading__hint" id="review-count"></p>
+            <p class="section-heading__hint" id="strength-review-count"></p>
           </div>
 
           <div class="table-card">
             <div class="table-wrap">
-              <table class="review-table">
-                <thead>
-                  <tr>
-                    <th>Дата</th>
-                    <th>Вправа</th>
-                    <th>Повтори / Опис</th>
-                    <th>Хв</th>
-                  </tr>
-                </thead>
-                <tbody id="review-table-body"></tbody>
+              <table class="review-table review-table--strength" id="strength-review-table">
+                <thead id="strength-review-head"></thead>
+                <tbody id="strength-review-body"></tbody>
               </table>
             </div>
           </div>
@@ -52,6 +45,6 @@
       <nav class="bottom-nav" aria-label="Основна навігація"></nav>
     </div>
 
-    <script type="module" src="scripts/review.js"></script>
+    <script type="module" src="scripts/strength-review.js"></script>
   </body>
 </html>
