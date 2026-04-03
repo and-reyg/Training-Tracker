@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#142233" />
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/monthly-review-table.css" />
   </head>
   <body data-page="review">
     <div class="app-shell">
@@ -31,9 +32,9 @@
             <p class="section-heading__hint" id="review-count"></p>
           </div>
 
-          <div class="table-card">
-            <div class="table-wrap">
-              <table class="review-table">
+          <div class="monthly-table-block">
+            <div class="monthly-table-scroll">
+              <table class="monthly-table" id="monthly-review-table">
                 <thead>
                   <tr>
                     <th>Дата</th>
@@ -52,6 +53,6 @@
       <nav class="bottom-nav" aria-label="Основна навігація"></nav>
     </div>
 
-    <script type="module" src="scripts/review.js"></script>
+    <script type="module" src="scripts/monthly-review-table.js"></script>
   </body>
 </html>

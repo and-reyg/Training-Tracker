@@ -17,12 +17,12 @@ function renderStrengthTable() {
 
   headElement.innerHTML = `
     <tr>
-      <th class="sticky-col-1" rowspan="2">Дата</th>
-      <th class="sticky-col-2" rowspan="2">Вправа</th>
-      ${Array.from({ length: maxSets }, (_, index) => `<th class="set-group" colspan="2">Сет ${index + 1}</th>`).join("")}
+      <th class="sv-sticky-1" rowspan="2">Дата</th>
+      <th class="sv-sticky-2" rowspan="2">Вправа</th>
+      ${Array.from({ length: maxSets }, (_, index) => `<th class="sv-set-group" colspan="2">Сет ${index + 1}</th>`).join("")}
     </tr>
     <tr>
-      ${Array.from({ length: maxSets }, () => '<th class="set-col">Кг</th><th class="set-col">Пвт</th>').join("")}
+      ${Array.from({ length: maxSets }, () => '<th class="sv-set-col">Кг</th><th class="sv-set-col">Пвт</th>').join("")}
     </tr>
   `;
 
@@ -37,11 +37,11 @@ function renderStrengthTable() {
 
   bodyElement.innerHTML = rows.map((row) => `
     <tr>
-      <td class="sticky-col-1">${row.formattedDate}</td>
-      <td class="sticky-col-2">${row.exerciseName}</td>
+      <td class="sv-sticky-1">${row.formattedDate}</td>
+      <td class="sv-sticky-2">${row.exerciseName}</td>
       ${Array.from({ length: maxSets }, (_, index) => {
         const set = row.sets[index];
-        return `<td class="set-col">${set ? set.weight : "—"}</td><td class="set-col">${set ? set.reps : "—"}</td>`;
+        return `<td class="sv-set-col">${set ? set.weight : "—"}</td><td class="sv-set-col">${set ? set.reps : "—"}</td>`;
       }).join("")}
     </tr>
   `).join("");

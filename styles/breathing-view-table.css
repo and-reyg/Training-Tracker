@@ -1,0 +1,68 @@
+﻿body[data-page="breathing-view"] .breathing-table-block {
+  border: 1px solid rgba(20, 34, 51, 0.22);
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 241, 233, 0.95));
+}
+
+body[data-page="breathing-view"] .breathing-table-scroll {
+  width: 100%;
+  max-height: min(72vh, 560px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body[data-page="breathing-view"] .breathing-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  table-layout: fixed;
+  font-size: 0.8rem;
+}
+
+body[data-page="breathing-view"] .breathing-table thead th,
+body[data-page="breathing-view"] .breathing-table tbody td {
+  padding: 7px 6px;
+  border-right: 1px solid rgba(20, 34, 51, 0.2);
+  border-bottom: 1px solid rgba(20, 34, 51, 0.2);
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+body[data-page="breathing-view"] .breathing-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #efe3d4;
+  color: #5e6d87;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+body[data-page="breathing-view"] .breathing-table thead th:first-child,
+body[data-page="breathing-view"] .breathing-table tbody td:first-child {
+  border-left: 1px solid rgba(20, 34, 51, 0.2);
+}
+
+body[data-page="breathing-view"] .breathing-table tbody td {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+body[data-page="breathing-view"] .breathing-table tbody tr:hover td {
+  background: rgba(31, 111, 120, 0.08);
+}
+
+@media (max-width: 520px) {
+  body[data-page="breathing-view"] .breathing-table {
+    font-size: 0.74rem;
+  }
+
+  body[data-page="breathing-view"] .breathing-table thead th,
+  body[data-page="breathing-view"] .breathing-table tbody td {
+    padding: 6px 4px;
+  }
+}
