@@ -27,7 +27,7 @@ export const EXERCISES = [
     color: "#c64a44",
   },
   { id: "fitness", name: "Фітнес", mode: "noteMinutes", color: "#0f8b70" },
-  { id: "plank", name: "Планка", mode: "minutes", color: "#6957cf" },
+  { id: "plank", name: "Планка", mode: "minutes", color: "#6957cf", minutesMin: 0.01, minutesStep: 0.01 },
   { id: "kegel", name: "Кегель", mode: "reps", color: "#f07b48" },
 ];
 
@@ -46,3 +46,5 @@ export function getModeLabel(mode) {
 export function getSummaryUnit(mode) {
   return mode === "reps" ? "Пвт" : "Хв";
 }
+
+

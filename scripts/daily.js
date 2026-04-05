@@ -199,6 +199,13 @@ function renderFields(exercise, values) {
   }
 
   if (exercise.mode === "minutes") {
+    const minutesMin = exercise.minutesMin ?? 1;
+    const minutesStep = exercise.minutesStep ?? 1;
+    const hasFractionalMinutes = minutesStep < 1;
+    const inputMode = hasFractionalMinutes ? "decimal" : "numeric";
+    const placeholder = hasFractionalMinutes ? "Наприклад 0.42" : "Наприклад 3";
+    const langAttribute = hasFractionalMinutes ? 'lang="en"' : "";
+
     return `
       <div class="field">
         <label for="${exercise.id}-minutes">Хвилини</label>
@@ -206,12 +213,13 @@ function renderFields(exercise, values) {
           id="${exercise.id}-minutes"
           name="minutes"
           type="number"
-          inputmode="numeric"
-          min="1"
-          step="1"
+          inputmode="${inputMode}"
+          min="${minutesMin}"
+          step="${minutesStep}"
           required
           value="${values.minutes}"
-          placeholder="Наприклад 3"
+          placeholder="${placeholder}"
+          ${langAttribute}
         />
       </div>
     `;
@@ -366,3 +374,6 @@ function buildPayload(exercise, formData) {
 
   return { note, minutes };
 }
+
+
+
