@@ -378,7 +378,7 @@ code {
 .primary-button,
 .secondary-button {
   padding: 11px 16px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .primary-button {
@@ -867,6 +867,79 @@ code {
   font-weight: 800;
 }
 
+/* Strength exercises visual polish */
+body[data-page="strength"] .exercise-card {
+  border-color: rgba(20, 34, 51, 0.16);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 236, 227, 0.92));
+}
+
+body[data-page="strength"] #strength-exercises {
+  margin-top: 10px;
+}
+
+body[data-page="strength"] .exercise-card__summary {
+  background: linear-gradient(90deg, rgba(20, 34, 51, 0.035), rgba(31, 111, 120, 0.025));
+}
+
+body[data-page="strength"] .exercise-card__name {
+  color: #122138;
+}
+
+body[data-page="strength"] .exercise-card__metric {
+  padding: 8px 9px;
+  border: 1px solid rgba(20, 34, 51, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+body[data-page="strength"] .exercise-card__metric-label {
+  color: #54647d;
+}
+
+body[data-page="strength"] .exercise-card__metric-value {
+  margin-top: 3px;
+  color: #122138;
+}
+
+body[data-page="strength"] .exercise-card__metric:nth-of-type(2) {
+  border-color: rgba(31, 111, 120, 0.25);
+  background: linear-gradient(180deg, rgba(31, 111, 120, 0.14), rgba(31, 111, 120, 0.06));
+}
+
+body[data-page="strength"] .exercise-card__metric:nth-of-type(3) {
+  border-color: rgba(232, 109, 91, 0.25);
+  background: linear-gradient(180deg, rgba(232, 109, 91, 0.16), rgba(232, 109, 91, 0.07));
+}
+
+body[data-page="strength"] .entry-row--strength {
+  border-color: rgba(20, 34, 51, 0.17);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 239, 231, 0.95));
+}
+
+body[data-page="strength"] .entry-list .entry-row--strength:nth-child(odd) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(251, 245, 236, 0.95));
+}
+
+body[data-page="strength"] .strength-entry-pill:first-child {
+  border-color: rgba(31, 111, 120, 0.35);
+  background: rgba(31, 111, 120, 0.1);
+  color: #104851;
+}
+
+body[data-page="strength"] .strength-entry-pill:last-child {
+  border-color: rgba(232, 109, 91, 0.35);
+  background: rgba(232, 109, 91, 0.11);
+  color: #8f3227;
+}
+
+body[data-page="strength"] .entry-row--strength .icon-button {
+  background: rgba(20, 34, 51, 0.1);
+}
+
+body[data-page="strength"] .entry-row--strength .icon-button--danger {
+  background: rgba(225, 89, 89, 0.16);
+}
+
 /* Strength table compact widths */
 body[data-page="strength-view"] {
   --sticky-col-1-width: 56px;
@@ -913,7 +986,13 @@ body[data-page="strength"] .page-main {
 .floating-timer__row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
+}
+
+body[data-page="strength"] .floating-timer__row .secondary-button {
+  padding: 10px 10px;
 }
 
 .timer-input {
@@ -954,6 +1033,11 @@ body[data-page="strength"] .page-main {
   body[data-page="strength-view"] {
     --sticky-col-1-width: 52px;
     --sticky-col-2-width: 76px;
+  }
+
+  body[data-page="strength"] .exercise-card__metric {
+    padding: 6px 6px;
+    border-radius: 10px;
   }
 
   .review-table--strength .set-group {

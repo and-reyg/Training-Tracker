@@ -1,4 +1,4 @@
-﻿import { initCommonPage } from "./common.js";
+import { initCommonPage } from "./common.js";
 import {
   addStrengthEntry,
   addStrengthExercise,
@@ -24,15 +24,20 @@ const cancelAddExerciseButton = document.querySelector("#cancel-add-strength-exe
 const exerciseListRoot = document.querySelector("#strength-exercises");
 const timerInput = document.querySelector("#strength-timer-input");
 const timerToggleButton = document.querySelector("#strength-timer-toggle");
+const timerStopButton = document.querySelector("#strength-timer-stop");
 const timerResetButton = document.querySelector("#strength-timer-reset");
 
 const timerState = {
   seconds: 0,
+  presetSeconds: 0,
   running: false,
   intervalId: null,
 };
 
 let audioContext = null;
+let timerAudio = null;
+const TIMER_AUDIO_SRC = "audio/timer_melody.mp3";
+const TIMER_PRESET_STORAGE_KEY = "trainingTracker.StrengthTimerPresetSeconds";
 
 initCommonPage();
 renderPage();
@@ -77,13 +82,13 @@ function renderExerciseCard(exercise, state) {
         </div>
 
         <div class="exercise-card__metric">
-          <span class="exercise-card__metric-label">Записів</span>
-          <span class="exercise-card__metric-value">${stats.entryCount}</span>
+          <span class="exercise-card__metric-label">Сетів сьогодні</span>
+          <span class="exercise-card__metric-value">${stats.setCount}</span>
         </div>
 
         <div class="exercise-card__metric">
-          <span class="exercise-card__metric-label">Остання</span>
-          <span class="exercise-card__metric-value ${entries.length ? "" : "is-muted"}">${stats.latestDate}</span>
+          <span class="exercise-card__metric-label">Останній сет</span>
+          <span class="exercise-card__metric-value ${entries.length ? "" : "is-muted"}">${stats.lastSet}</span>
         </div>
       </button>
 
@@ -128,8 +133,8 @@ function renderPanel(exercise, entries, isRenaming, editingEntry) {
         <div class="entry-list">
           ${
             entries.length
-              ? entries.map((entry) => renderEntryRow(entry)).join("")
-              : '<div class="empty-inline">Поки що немає записів для цієї силової вправи.</div>'
+              ? entries.map((entry) => renderEntryRow(exercise.id, entry)).join("")
+              : '<div class="empty-inline">Сьогодні ще немає сетів для цієї вправи.</div>'
           }
         </div>
 
@@ -154,7 +159,7 @@ function renderRenameForm(exercise) {
   `;
 }
 
-function renderEntryRow(entry) {
+function renderEntryRow(exerciseId, entry) {
   return `
     <div class="entry-row entry-row--strength">
       <div class="entry-row__value entry-row__value--strength">
@@ -168,6 +173,7 @@ function renderEntryRow(entry) {
           class="icon-button"
           title="Редагувати"
           data-action="edit-entry"
+          data-exercise-id="${exerciseId}"
           data-entry-id="${entry.id}"
         >
           &#9998;
@@ -177,6 +183,7 @@ function renderEntryRow(entry) {
           class="icon-button icon-button--danger"
           title="Видалити"
           data-action="delete-entry"
+          data-exercise-id="${exerciseId}"
           data-entry-id="${entry.id}"
         >
           &#10005;
@@ -318,7 +325,7 @@ function attachDynamicEvents(state) {
         return;
       }
 
-      if (!window.confirm(`Видалити вправу "${exercise.name}" разом з усіма записами?`)) {
+      if (!window.confirm(`Видалити вправу "${exercise.name}"? Історія за минулі дні залишиться.`)) {
         return;
       }
 
@@ -332,30 +339,30 @@ function attachDynamicEvents(state) {
 
   exerciseListRoot.querySelectorAll('[data-action="edit-entry"]').forEach((button) => {
     button.addEventListener("click", () => {
-      const { entryId } = button.dataset;
-      const entry = state.entries.find((item) => item.id === entryId);
+      const { exerciseId, entryId } = button.dataset;
+      const entry = (state.currentDay.entriesByExercise[exerciseId] ?? []).find(
+        (item) => item.id === entryId,
+      );
 
       if (!entry) {
         return;
       }
 
-      uiState.editingEntryByExerciseId[entry.exerciseId] = entry;
-      uiState.openExerciseId = entry.exerciseId;
+      uiState.editingEntryByExerciseId[exerciseId] = entry;
+      uiState.openExerciseId = exerciseId;
       renderPage();
     });
   });
 
   exerciseListRoot.querySelectorAll('[data-action="delete-entry"]').forEach((button) => {
     button.addEventListener("click", () => {
-      const { entryId } = button.dataset;
+      const { exerciseId, entryId } = button.dataset;
 
-      deleteStrengthEntry(entryId);
+      deleteStrengthEntry(exerciseId, entryId);
 
-      Object.keys(uiState.editingEntryByExerciseId).forEach((exerciseId) => {
-        if (uiState.editingEntryByExerciseId[exerciseId]?.id === entryId) {
-          delete uiState.editingEntryByExerciseId[exerciseId];
-        }
-      });
+      if (uiState.editingEntryByExerciseId[exerciseId]?.id === entryId) {
+        delete uiState.editingEntryByExerciseId[exerciseId];
+      }
 
       renderPage();
     });
@@ -382,10 +389,10 @@ function attachDynamicEvents(state) {
         return;
       }
 
-      const entryId = formData.get("entryId");
+      const entryId = String(formData.get("entryId") ?? "");
 
-      if (typeof entryId === "string" && entryId) {
-        updateStrengthEntry(entryId, { weight, reps });
+      if (entryId) {
+        updateStrengthEntry(exerciseId, entryId, { weight, reps });
       } else {
         addStrengthEntry(exerciseId, { weight, reps });
       }
@@ -398,13 +405,16 @@ function attachDynamicEvents(state) {
 }
 
 function initTimer() {
-  if (!timerInput || !timerToggleButton || !timerResetButton) {
+  if (!timerInput || !timerToggleButton || !timerStopButton || !timerResetButton) {
     return;
   }
 
+  timerState.presetSeconds = readTimerPresetSeconds();
+  timerState.seconds = timerState.presetSeconds;
   timerInput.addEventListener("input", handleTimerInput);
   timerInput.addEventListener("blur", syncTimerInputFromField);
   timerToggleButton.addEventListener("click", toggleTimer);
+  timerStopButton.addEventListener("click", stopAndRestoreTimer);
   timerResetButton.addEventListener("click", resetTimer);
   renderTimer();
 }
@@ -422,22 +432,34 @@ function handleTimerInput() {
   }
 
   timerState.seconds = parseTimerValue(timerInput.value);
+  timerState.presetSeconds = timerState.seconds;
+  writeTimerPresetSeconds(timerState.presetSeconds);
   renderTimer();
 }
 
 function syncTimerInputFromField() {
   timerState.seconds = parseTimerValue(timerInput.value);
+  timerState.presetSeconds = timerState.seconds;
+  writeTimerPresetSeconds(timerState.presetSeconds);
   renderTimer();
 }
 
 async function toggleTimer() {
   if (timerState.running) {
     stopTimer();
+    stopTimerAlertSound();
     renderTimer();
     return;
   }
 
-  timerState.seconds = parseTimerValue(timerInput.value);
+  const typedSeconds = parseTimerValue(timerInput.value);
+  if (typedSeconds > 0) {
+    timerState.seconds = typedSeconds;
+    timerState.presetSeconds = typedSeconds;
+    writeTimerPresetSeconds(timerState.presetSeconds);
+  } else if (timerState.seconds <= 0 && timerState.presetSeconds > 0) {
+    timerState.seconds = timerState.presetSeconds;
+  }
 
   if (timerState.seconds <= 0) {
     renderTimer();
@@ -460,9 +482,19 @@ async function toggleTimer() {
   renderTimer();
 }
 
+function stopAndRestoreTimer() {
+  stopTimer();
+  stopTimerAlertSound();
+  timerState.seconds = timerState.presetSeconds;
+  renderTimer();
+}
+
 function resetTimer() {
   stopTimer();
+  stopTimerAlertSound();
   timerState.seconds = 0;
+  timerState.presetSeconds = 0;
+  writeTimerPresetSeconds(0);
   renderTimer();
 }
 
@@ -524,6 +556,11 @@ async function ensureAudioContext() {
 }
 
 async function playTimerAlert() {
+  const playedCustom = await playCustomTimerAudio();
+  if (playedCustom) {
+    return;
+  }
+
   const context = await ensureAudioContext();
 
   if (!context) {
@@ -533,6 +570,56 @@ async function playTimerAlert() {
   const startAt = context.currentTime + 0.02;
   playBellTone(context, startAt, 880, 0.22);
   playBellTone(context, startAt + 0.34, 988, 0.26);
+}
+
+async function playCustomTimerAudio() {
+  if (!timerAudio) {
+    timerAudio = new Audio(TIMER_AUDIO_SRC);
+    timerAudio.preload = "auto";
+  }
+
+  try {
+    timerAudio.pause();
+    timerAudio.currentTime = 0;
+    await timerAudio.play();
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function stopTimerAlertSound() {
+  if (!timerAudio) {
+    return;
+  }
+
+  try {
+    timerAudio.pause();
+    timerAudio.currentTime = 0;
+  } catch (error) {
+    // no-op
+  }
+}
+
+function readTimerPresetSeconds() {
+  try {
+    const raw = localStorage.getItem(TIMER_PRESET_STORAGE_KEY);
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value < 0) {
+      return 0;
+    }
+    return Math.floor(value);
+  } catch (error) {
+    return 0;
+  }
+}
+
+function writeTimerPresetSeconds(value) {
+  try {
+    localStorage.setItem(TIMER_PRESET_STORAGE_KEY, String(Math.max(0, Math.floor(value || 0))));
+  } catch (error) {
+    // no-op
+  }
 }
 
 function playBellTone(context, startAt, frequency, duration) {
