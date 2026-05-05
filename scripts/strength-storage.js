@@ -68,7 +68,7 @@ function normalizeSet(rawSet) {
   const weight = Number(rawSet.weight);
   const reps = Number(rawSet.reps);
 
-  if (!Number.isFinite(weight) || !Number.isFinite(reps) || weight <= 0 || reps <= 0) {
+  if (!Number.isFinite(weight) || !Number.isFinite(reps) || weight < 0 || reps <= 0) {
     return null;
   }
 
@@ -349,7 +349,7 @@ export function addStrengthEntry(exerciseId, values) {
 
     const weight = Number(values.weight);
     const reps = Number(values.reps);
-    if (!Number.isFinite(weight) || !Number.isFinite(reps) || weight <= 0 || reps <= 0) {
+    if (!Number.isFinite(weight) || !Number.isFinite(reps) || weight < 0 || reps <= 0) {
       return;
     }
 
@@ -374,7 +374,7 @@ export function updateStrengthEntry(exerciseId, entryId, values) {
 
     const weight = Number(values.weight);
     const reps = Number(values.reps);
-    if (!Number.isFinite(weight) || !Number.isFinite(reps) || weight <= 0 || reps <= 0) {
+    if (!Number.isFinite(weight) || !Number.isFinite(reps) || weight < 0 || reps <= 0) {
       return;
     }
 

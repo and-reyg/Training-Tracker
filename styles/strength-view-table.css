@@ -1,14 +1,19 @@
 body[data-page="strength-view"] .strength-view-main {
-  padding-bottom: 86px;
+  padding-bottom: 74px;
 }
 
 body[data-page="strength-view"] .strength-view-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 body[data-page="strength-view"] .strength-table-shell {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
   border: 1px solid rgba(20, 34, 51, 0.22);
   border-radius: 20px;
   overflow: hidden;
@@ -16,8 +21,10 @@ body[data-page="strength-view"] .strength-table-shell {
 }
 
 body[data-page="strength-view"] .strength-table-shell__landscape {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
-  height: min(72dvh, 560px);
+  height: auto;
 }
 
 body[data-page="strength-view"] .strength-table-scroll {
@@ -129,7 +136,7 @@ body[data-page="strength-view"] .strength-table .table-note {
   }
 
   body[data-page="strength-view"] .strength-view-main {
-    padding-bottom: 76px;
+    padding-bottom: 70px;
   }
 
   body[data-page="strength-view"] .strength-table-shell {
@@ -137,30 +144,17 @@ body[data-page="strength-view"] .strength-table .table-note {
   }
 
   body[data-page="strength-view"] .strength-table-shell__landscape {
-    position: relative;
-    height: calc(100dvh - 250px);
-    min-height: 340px;
-    max-height: 500px;
-    overflow: hidden;
-  }
-
-  body[data-page="strength-view"] .strength-table-shell__landscape .strength-table-scroll {
-    position: absolute;
-    top: 0;
-    left: 100%;
-    transform-origin: top left;
-    transform: rotate(90deg);
-    width: calc(100dvh - 250px);
-    height: calc(100vw - 24px);
+    height: calc(100dvh - 200px);
+    min-height: 360px;
   }
 
   body[data-page="strength-view"] .strength-table {
-    font-size: 1.06rem;
+    font-size: 1rem;
   }
 
   body[data-page="strength-view"] .strength-table thead th,
   body[data-page="strength-view"] .strength-table tbody td {
-    padding: 7px 4px;
+    padding: 7px 5px;
   }
 
   body[data-page="strength-view"] .strength-table thead th {
@@ -190,17 +184,8 @@ body[data-page="strength-view"] .strength-table .table-note {
 
 @media (max-width: 520px) and (orientation: landscape) {
   body[data-page="strength-view"] .strength-table-shell__landscape {
-    height: calc(100dvh - 190px);
+    height: calc(100dvh - 170px);
     min-height: 260px;
-    max-height: 420px;
-    overflow: auto;
-  }
-
-  body[data-page="strength-view"] .strength-table-shell__landscape .strength-table-scroll {
-    position: static;
-    transform: none;
-    width: 100%;
-    height: 100%;
   }
 
   body[data-page="strength-view"] .strength-table {

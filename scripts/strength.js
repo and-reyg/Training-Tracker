@@ -209,7 +209,7 @@ function renderEntryForm(exerciseId, editingEntry) {
             name="weight"
             type="number"
             inputmode="decimal"
-            min="0.5"
+            min="0"
             step="0.5"
             required
             value="${values.weight}"
@@ -385,7 +385,7 @@ function attachDynamicEvents(state) {
       const weight = Number(formData.get("weight"));
       const reps = Number(formData.get("reps"));
 
-      if (!weight || !reps) {
+      if (!Number.isFinite(weight) || weight < 0 || !Number.isFinite(reps) || reps <= 0) {
         return;
       }
 
