@@ -103,14 +103,22 @@ body[data-page="strength-view"] .strength-table tbody .sv-sticky-2 {
 
 body[data-page="strength-view"] .strength-table .sv-sticky-1 {
   left: 0;
-  width: 64px;
-  min-width: 64px;
+  width: 54px;
+  min-width: 54px;
+  max-width: 54px;
 }
 
 body[data-page="strength-view"] .strength-table .sv-sticky-2 {
-  left: 64px;
-  width: 108px;
-  min-width: 108px;
+  left: 54px;
+  width: clamp(130px, 34vw, 220px);
+  min-width: 130px;
+  max-width: 220px;
+}
+
+body[data-page="strength-view"] .strength-table .sv-exercise-col {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.25;
 }
 
 body[data-page="strength-view"] .strength-table .sv-set-group {
@@ -128,6 +136,24 @@ body[data-page="strength-view"] .strength-table .table-note {
   color: #5d6d85;
   background: #fff9ef;
   padding: 14px 8px;
+}
+
+body[data-page="strength-view"] .strength-table tbody tr.sv-band-odd td {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+body[data-page="strength-view"] .strength-table tbody tr.sv-band-even td {
+  background: rgba(248, 240, 230, 0.95);
+}
+
+body[data-page="strength-view"] .strength-table tbody tr.sv-band-odd td.sv-sticky-1,
+body[data-page="strength-view"] .strength-table tbody tr.sv-band-odd td.sv-sticky-2 {
+  background: #f7eddf;
+}
+
+body[data-page="strength-view"] .strength-table tbody tr.sv-band-even td.sv-sticky-1,
+body[data-page="strength-view"] .strength-table tbody tr.sv-band-even td.sv-sticky-2 {
+  background: #eddcc8;
 }
 
 @media (max-width: 520px) {
@@ -162,14 +188,16 @@ body[data-page="strength-view"] .strength-table .table-note {
   }
 
   body[data-page="strength-view"] .strength-table .sv-sticky-1 {
-    width: 70px;
-    min-width: 70px;
+    width: 52px;
+    min-width: 52px;
+    max-width: 52px;
   }
 
   body[data-page="strength-view"] .strength-table .sv-sticky-2 {
-    left: 70px;
-    width: 120px;
+    left: 52px;
+    width: clamp(120px, 38vw, 180px);
     min-width: 120px;
+    max-width: 180px;
   }
 
   body[data-page="strength-view"] .strength-table .sv-set-group {

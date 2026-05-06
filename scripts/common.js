@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { page: "breathing-view", href: "breathing-view.html", label: "Дих View" },
   { page: "strength", href: "strength-exercises.html", label: "Сила" },
   { page: "strength-view", href: "strength-view.html", label: "Сила View" },
+  { page: "text-result", href: "text-result.html", label: "TextResult" },
   { page: "settings", href: "settings.html", label: "Settings" },
 ];
 

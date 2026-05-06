@@ -940,6 +940,63 @@ body[data-page="strength"] .entry-row--strength .icon-button--danger {
   background: rgba(225, 89, 89, 0.16);
 }
 
+/* TextResult page */
+body[data-page="text-result"] .text-result-main {
+  padding-bottom: 74px;
+}
+
+body[data-page="text-result"] .text-result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+body[data-page="text-result"] .text-result-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+body[data-page="text-result"] .text-result-toolbar__days {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-page="text-result"] #tr-days-input {
+  width: 4.5rem;
+  padding: 9px 10px;
+  border: 1px solid rgba(20, 34, 51, 0.14);
+  border-radius: 12px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+body[data-page="text-result"] .text-result-output-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid rgba(20, 34, 51, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  overflow: hidden;
+}
+
+body[data-page="text-result"] .text-result-output {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  padding: 14px;
+  overflow: auto;
+  white-space: pre;
+  font-family: "Space Grotesk", monospace;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
 /* Strength table compact widths */
 body[data-page="strength-view"] {
   --sticky-col-1-width: 56px;
@@ -1028,6 +1085,20 @@ body[data-page="strength"] .floating-timer__row .secondary-button {
 
   body[data-page="strength"] .page-main {
     padding-bottom: 156px;
+  }
+
+  body[data-page="text-result"] .text-result-main {
+    padding-bottom: 70px;
+  }
+
+  body[data-page="text-result"] .text-result-toolbar {
+    gap: 8px;
+  }
+
+  body[data-page="text-result"] .text-result-output {
+    min-height: 260px;
+    padding: 12px;
+    font-size: 0.88rem;
   }
 
   body[data-page="strength-view"] {

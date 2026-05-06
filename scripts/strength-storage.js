@@ -1,7 +1,7 @@
 import { formatDateKey, getBusinessDateKey } from "./storage.js";
 
 export const STRENGTH_STORAGE_KEY = "trainingTracker.Strength";
-const STRENGTH_HISTORY_LIMIT_DAYS = 30;
+export const STRENGTH_HISTORY_LIMIT_DATES = 60;
 
 function createId(prefix) {
   if (window.crypto?.randomUUID) {
@@ -13,7 +13,7 @@ function createId(prefix) {
 
 function createDefaultState() {
   return {
-    version: 2,
+    version: 3,
     exercises: [],
     currentDay: {
       date: getBusinessDateKey(),
@@ -28,7 +28,7 @@ function safeReadStorage() {
     const rawValue = localStorage.getItem(STRENGTH_STORAGE_KEY);
     return rawValue ? JSON.parse(rawValue) : null;
   } catch (error) {
-    console.error("Не вдалося прочитати strength localStorage:", error);
+    console.error("Failed to read strength localStorage:", error);
     return null;
   }
 }
@@ -37,7 +37,7 @@ function safeWriteStorage(state) {
   try {
     localStorage.setItem(STRENGTH_STORAGE_KEY, JSON.stringify(state));
   } catch (error) {
-    console.error("Не вдалося записати strength localStorage:", error);
+    console.error("Failed to write strength localStorage:", error);
   }
 }
 
@@ -47,7 +47,6 @@ function normalizeExercise(rawExercise) {
   }
 
   const name = String(rawExercise.name ?? "").trim();
-
   if (!name) {
     return null;
   }
@@ -90,7 +89,6 @@ function normalizeCurrentDay(rawCurrentDay, exercises) {
     const rawSets = Array.isArray(rawCurrentDay?.entriesByExercise?.[exercise.id])
       ? rawCurrentDay.entriesByExercise[exercise.id]
       : [];
-
     currentDay.entriesByExercise[exercise.id] = rawSets.map(normalizeSet).filter(Boolean);
   });
 
@@ -139,7 +137,7 @@ function normalizeHistoryDay(rawDay) {
 }
 
 function migrateLegacyRows(rawEntries = []) {
-  const grouped = new Map();
+  const groupedByDate = new Map();
 
   rawEntries.forEach((entry) => {
     if (!entry || typeof entry !== "object") {
@@ -155,9 +153,9 @@ function migrateLegacyRows(rawEntries = []) {
       return;
     }
 
-    const dayBucket = grouped.get(date) ?? new Map();
+    const dayRows = groupedByDate.get(date) ?? new Map();
     const rowKey = `${exerciseId}__${exerciseName}`;
-    const row = dayBucket.get(rowKey) ?? {
+    const row = dayRows.get(rowKey) ?? {
       exerciseId,
       exerciseName,
       createdAt: set.createdAt,
@@ -169,19 +167,17 @@ function migrateLegacyRows(rawEntries = []) {
       row.createdAt = set.createdAt;
     }
 
-    dayBucket.set(rowKey, row);
-    grouped.set(date, dayBucket);
+    dayRows.set(rowKey, row);
+    groupedByDate.set(date, dayRows);
   });
 
-  const days = [...grouped.entries()]
-    .map(([date, dayRows]) => ({
+  return [...groupedByDate.entries()]
+    .map(([date, rowsMap]) => ({
       date,
-      rows: [...dayRows.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+      rows: [...rowsMap.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
     }))
     .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(-STRENGTH_HISTORY_LIMIT_DAYS);
-
-  return days;
+    .slice(-STRENGTH_HISTORY_LIMIT_DATES);
 }
 
 function normalizeState(rawState) {
@@ -200,10 +196,10 @@ function normalizeState(rawState) {
   }
 
   history.sort((a, b) => a.date.localeCompare(b.date));
-  history = history.slice(-STRENGTH_HISTORY_LIMIT_DAYS);
+  history = history.slice(-STRENGTH_HISTORY_LIMIT_DATES);
 
   return {
-    version: 2,
+    version: 3,
     exercises,
     currentDay,
     history,
@@ -218,7 +214,6 @@ function buildHistoryDayFromCurrent(state) {
   const rows = state.exercises
     .map((exercise) => {
       const sets = state.currentDay.entriesByExercise[exercise.id] ?? [];
-
       if (!sets.length) {
         return null;
       }
@@ -243,14 +238,25 @@ function buildHistoryDayFromCurrent(state) {
 }
 
 function upsertHistoryDay(history, historyDay) {
-  const withoutCurrentDate = history.filter((day) => day.date !== historyDay.date);
-  withoutCurrentDate.push(historyDay);
-  withoutCurrentDate.sort((a, b) => a.date.localeCompare(b.date));
-  return withoutCurrentDate.slice(-STRENGTH_HISTORY_LIMIT_DAYS);
+  const withoutSameDate = history.filter((day) => day.date !== historyDay.date);
+  withoutSameDate.push(historyDay);
+  withoutSameDate.sort((a, b) => a.date.localeCompare(b.date));
+  return withoutSameDate.slice(-STRENGTH_HISTORY_LIMIT_DATES);
 }
 
 function createEmptyEntriesByExercise(exercises) {
   return Object.fromEntries(exercises.map((exercise) => [exercise.id, []]));
+}
+
+function enforceUniqueDateLimit(state) {
+  const hasCurrent = hasAnyCurrentSets(state.currentDay);
+  const targetHistoryLimit = hasCurrent
+    ? Math.max(0, STRENGTH_HISTORY_LIMIT_DATES - 1)
+    : STRENGTH_HISTORY_LIMIT_DATES;
+
+  if (state.history.length > targetHistoryLimit) {
+    state.history = state.history.slice(-targetHistoryLimit);
+  }
 }
 
 function ensureFreshState() {
@@ -277,6 +283,7 @@ function ensureFreshState() {
     });
   }
 
+  enforceUniqueDateLimit(state);
   safeWriteStorage(state);
   return state;
 }
@@ -284,8 +291,75 @@ function ensureFreshState() {
 function mutateState(mutator) {
   const state = ensureFreshState();
   mutator(state);
+  enforceUniqueDateLimit(state);
   safeWriteStorage(state);
   return state;
+}
+
+function buildSet(values, existingSet = null) {
+  return {
+    id: existingSet?.id ?? createId("strength-set"),
+    weight: Number(values.weight),
+    reps: Number(values.reps),
+    createdAt: existingSet?.createdAt ?? new Date().toISOString(),
+  };
+}
+
+function sortSetsByCreatedAt(sets = []) {
+  return [...sets].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+function getGroupedDays(state) {
+  const historyDays = state.history.map((day) => ({
+    date: day.date,
+    rows: day.rows.map((row) => ({
+      exerciseId: row.exerciseId,
+      exerciseName: row.exerciseName,
+      createdAt: row.createdAt,
+      sets: sortSetsByCreatedAt(row.sets),
+    })),
+  }));
+
+  const todayRows = state.exercises
+    .map((exercise) => {
+      const sets = state.currentDay.entriesByExercise[exercise.id] ?? [];
+      if (!sets.length) {
+        return null;
+      }
+
+      return {
+        exerciseId: exercise.id,
+        exerciseName: exercise.name,
+        createdAt: sets[sets.length - 1]?.createdAt ?? new Date().toISOString(),
+        sets: sortSetsByCreatedAt(sets),
+      };
+    })
+    .filter(Boolean);
+
+  const merged = [...historyDays];
+  if (todayRows.length) {
+    merged.push({
+      date: state.currentDay.date,
+      rows: todayRows,
+    });
+  }
+
+  const uniqueByDate = new Map();
+  merged.forEach((day) => {
+    if (!day.rows.length) {
+      return;
+    }
+    uniqueByDate.set(day.date, day);
+  });
+
+  return [...uniqueByDate.values()]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, STRENGTH_HISTORY_LIMIT_DATES)
+    .map((day) => ({
+      ...day,
+      formattedDate: formatDateKey(day.date, "short"),
+      rows: [...day.rows].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    }));
 }
 
 export function getStrengthStateSnapshot() {
@@ -295,7 +369,6 @@ export function getStrengthStateSnapshot() {
 export function addStrengthExercise(name) {
   return mutateState((state) => {
     const normalizedName = String(name).trim();
-
     if (!normalizedName) {
       return;
     }
@@ -330,19 +403,9 @@ export function deleteStrengthExercise(exerciseId) {
   });
 }
 
-function buildSet(values, existingSet = null) {
-  return {
-    id: existingSet?.id ?? createId("strength-set"),
-    weight: Number(values.weight),
-    reps: Number(values.reps),
-    createdAt: existingSet?.createdAt ?? new Date().toISOString(),
-  };
-}
-
 export function addStrengthEntry(exerciseId, values) {
   return mutateState((state) => {
     const exercise = state.exercises.find((item) => item.id === exerciseId);
-
     if (!exercise) {
       return;
     }
@@ -362,7 +425,6 @@ export function addStrengthEntry(exerciseId, values) {
 export function updateStrengthEntry(exerciseId, entryId, values) {
   return mutateState((state) => {
     const list = state.currentDay.entriesByExercise[exerciseId];
-
     if (!Array.isArray(list)) {
       return;
     }
@@ -385,7 +447,6 @@ export function updateStrengthEntry(exerciseId, entryId, values) {
 export function deleteStrengthEntry(exerciseId, entryId) {
   return mutateState((state) => {
     const list = state.currentDay.entriesByExercise[exerciseId];
-
     if (!Array.isArray(list)) {
       return;
     }
@@ -410,43 +471,22 @@ export function getStrengthExerciseStats(state, exerciseId) {
   };
 }
 
+export function getStrengthDateGroups(state) {
+  return getGroupedDays(state);
+}
+
 export function getStrengthTableData(state) {
-  const todayRows = state.exercises
-    .map((exercise) => {
-      const sets = getStrengthEntriesByExercise(state, exercise.id);
-      if (!sets.length) {
-        return null;
-      }
-
-      return {
-        date: state.currentDay.date,
-        exerciseId: exercise.id,
-        exerciseName: exercise.name,
-        createdAt: sets[sets.length - 1].createdAt,
-        sets: sets.map((set) => ({ ...set })),
-      };
-    })
-    .filter(Boolean);
-
-  const rows = [...state.history, { date: state.currentDay.date, rows: todayRows }]
-    .flatMap((day) =>
-      day.rows.map((row) => ({
-        date: day.date,
-        exerciseId: row.exerciseId,
-        exerciseName: row.exerciseName,
-        createdAt: row.createdAt,
-        formattedDate: formatDateKey(day.date, "short"),
-        sets: [...row.sets].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
-      })),
-    )
-    .sort((a, b) => {
-      const dateCompare = b.date.localeCompare(a.date);
-      if (dateCompare !== 0) {
-        return dateCompare;
-      }
-
-      return b.createdAt.localeCompare(a.createdAt);
-    });
+  const days = getGroupedDays(state);
+  const rows = days.flatMap((day) =>
+    day.rows.map((row) => ({
+      date: day.date,
+      formattedDate: day.formattedDate,
+      exerciseId: row.exerciseId,
+      exerciseName: row.exerciseName,
+      createdAt: row.createdAt,
+      sets: row.sets,
+    })),
+  );
 
   const maxSets = Math.max(1, ...rows.map((row) => row.sets.length));
 

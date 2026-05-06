@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Tracker | TextResult</title>
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+    <link rel="apple-touch-icon" href="img/web-app-manifest-192x192.png" />
+    <meta name="theme-color" content="#142233" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body data-page="text-result">
+    <div class="app-shell">
+      <header class="page-header">
+        <div class="page-header__inner">
+          <div class="page-header__title-row">
+            <h1>TextResult</h1>
+            <p class="page-header__date" id="business-date"></p>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-main page-main--wide text-result-main">
+        <section class="page-section page-section--tight text-result-section">
+          <div class="section-heading section-heading--compact">
+            <div>
+              <p class="section-heading__eyebrow">Strength export</p>
+              <h2>Текст по силовим тренуванням</h2>
+            </div>
+          </div>
+
+          <div class="text-result-toolbar">
+            <button type="button" class="secondary-button" id="tr-last-day">Last day</button>
+
+            <div class="text-result-toolbar__days">
+              <input
+                id="tr-days-input"
+                type="number"
+                min="1"
+                max="60"
+                step="1"
+                inputmode="numeric"
+                value="7"
+                aria-label="Кількість днів"
+              />
+              <button type="button" class="secondary-button" id="tr-get">Get</button>
+            </div>
+
+            <button type="button" class="secondary-button" id="tr-copy">Copy</button>
+            <button type="button" class="secondary-button" id="tr-clear">Clear</button>
+          </div>
+
+          <div class="text-result-output-wrap">
+            <pre id="tr-output" class="text-result-output"></pre>
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Основна навігація"></nav>
+    </div>
+
+    <script type="module" src="scripts/text-result.js"></script>
+  </body>
+</html>

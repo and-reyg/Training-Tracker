@@ -1,5 +1,9 @@
 import { initCommonPage } from "./common.js";
-import { getStrengthStateSnapshot, getStrengthTableData } from "./strength-storage.js";
+import {
+  STRENGTH_HISTORY_LIMIT_DATES,
+  getStrengthStateSnapshot,
+  getStrengthTableData,
+} from "./strength-storage.js";
 
 const countElement = document.querySelector("#strength-review-count");
 const headElement = document.querySelector("#strength-review-head");
@@ -10,9 +14,10 @@ renderStrengthTable();
 
 function renderStrengthTable() {
   const { rows, maxSets } = getStrengthTableData(getStrengthStateSnapshot());
+  const uniqueDatesCount = new Set(rows.map((row) => row.date)).size;
 
   countElement.textContent = rows.length
-    ? `Показано рядків: ${rows.length} (останні 30 днів)`
+    ? `Унікальних дат: ${uniqueDatesCount} / ${STRENGTH_HISTORY_LIMIT_DATES}`
     : "Поки що немає силових записів.";
 
   headElement.innerHTML = `
@@ -35,18 +40,29 @@ function renderStrengthTable() {
     return;
   }
 
+  let currentDate = "";
+  let dateBand = 0;
+
   bodyElement.innerHTML = rows
-    .map(
-      (row) => `
-      <tr>
-        <td class="sv-sticky-1">${row.formattedDate}</td>
-        <td class="sv-sticky-2">${row.exerciseName}</td>
-        ${Array.from({ length: maxSets }, (_, index) => {
-          const set = row.sets[index];
-          return `<td class="sv-set-col">${set ? set.weight : "—"}</td><td class="sv-set-col">${set ? set.reps : "—"}</td>`;
-        }).join("")}
-      </tr>
-    `,
-    )
+    .map((row) => {
+      if (row.date !== currentDate) {
+        currentDate = row.date;
+        dateBand += 1;
+      }
+
+      const bandClass = dateBand % 2 === 0 ? "sv-band-even" : "sv-band-odd";
+      const setsHtml = Array.from({ length: maxSets }, (_, index) => {
+        const set = row.sets[index];
+        return `<td class="sv-set-col">${set ? set.weight : "—"}</td><td class="sv-set-col">${set ? set.reps : "—"}</td>`;
+      }).join("");
+
+      return `
+        <tr class="${bandClass}">
+          <td class="sv-sticky-1">${row.formattedDate}</td>
+          <td class="sv-sticky-2 sv-exercise-col">${row.exerciseName}</td>
+          ${setsHtml}
+        </tr>
+      `;
+    })
     .join("");
 }
