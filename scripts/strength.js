@@ -51,7 +51,10 @@ function renderPage() {
   addExerciseForm.classList.toggle("is-hidden", !uiState.showAddExerciseForm);
 
   exerciseListRoot.innerHTML = state.exercises.length
-    ? state.exercises.map((exercise) => renderExerciseCard(exercise, state)).join("")
+    ? [...state.exercises]
+        .sort((a, b) => a.name.localeCompare(b.name, "uk"))
+        .map((exercise) => renderExerciseCard(exercise, state))
+        .join("")
     : '<div class="empty-inline">Силових вправ ще немає. Додай першу вправу через кнопку вище.</div>';
 
   attachDynamicEvents(state);
